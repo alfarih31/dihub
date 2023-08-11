@@ -1,6 +1,7 @@
 from typing import Set, List
 
-from pydi import provider, export, ProviderScope
+from pydi.constants import ProviderScope
+from pydi.decorators import export, provider
 from student.interfaces.repositories.student_repository import IStudentRepository
 from student.models.student import Student
 from student.student_tokens import STUDENT_REPOSITORY

@@ -1,6 +1,6 @@
 from typing import List
 
-from pydi import inject, provider, export
+from pydi.decorators import inject, provider, export
 from student.interfaces.repositories.student_repository import IStudentRepository
 from student.interfaces.services.student_service import IStudentService
 from student.models.student import Student

@@ -1,4 +1,4 @@
-from pydi import module
+from pydi.decorators import module
 from .repositories import repositories
 from .services import services
 

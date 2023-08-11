@@ -20,7 +20,7 @@ class ProviderProxy:
     #     return self.__provide
 
     def __str__(self):
-        return "<%s '%s'>" % (self.__repr__(), str(self.__provide))
+        return "<%s %s>" % (self.__repr__(), str(self.__provide))
 
     def __eq__(self, other: Any):
         if isinstance(other, ProviderProxy):
@@ -37,10 +37,9 @@ class ProviderProxy:
             self.__provide = self.__provide()
 
     def on_post_boot(self):
-        if isinstance(self.__provide, type(self.__provide)):
-            for _, method in getmembers(self.__provide, predicate=lambda x: hasattr(x, self.__ACTUAL_INIT) and not isclass(x)):
-                mi = getattr(method, self.__ACTUAL_INIT)
-                mi()
+        if not isclass(self.__provide):
+            for _, method in getmembers(self.__provide, predicate=lambda x: isinstance(x, ProviderProxy)):
+                method.on_post_boot()
 
             if hasattr(self.__provide, self.__ACTUAL_INIT):
                 getattr(self.__provide, self.__ACTUAL_INIT)()
@@ -49,7 +48,7 @@ class ProviderProxy:
         return getattr(self.__provide, item)
 
     def __copy__(self):
-        # Avoiding copied ProviderProxy.provide is a ProviderProxy
+        # Avoid copy ProviderProxy.provide as ProviderProxy
         if isinstance(self.__provide, ProviderProxy):
             return self.__provide.__copy__()
 

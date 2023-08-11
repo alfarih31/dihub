@@ -1,15 +1,13 @@
 from inspect import isfunction
 from typing import Callable, List, Any
 
-from pydi.__internal.primitive_proxy import PrimitiveProxy
+from pydi.__internal.delegates import InjectedDelegate, ModuleDelegate
+from pydi.__internal.proxies import PrimitiveProxy
+from pydi.annotations import ModuleAnnotation, ProviderAnnotation
 from pydi.constants import _MODULE_ANNOTATIONS, ProviderScope, _PROVIDER_ANNOTATIONS
 from pydi.exceptions import NotAPyDIModule, AnnotationsNotSupported, NotAPyDIProvider
-from pydi.injected_metaclass import InjectedMetaclass
-from pydi.module_annotation import ModuleAnnotation
-from pydi.module_container import ModuleContainer
-from pydi.provider_annotations import ProviderAnnotation
 from pydi.typing import InjectToken
-from pydi.typing import Providers, Modules, IModuleContainer, Provide
+from pydi.typing import Providers, Modules, IModuleDelegate, Provide
 
 
 def __get_list_defaults(arr: List[Any]) -> List[Any]:
@@ -30,15 +28,15 @@ def module(imports: Modules = [], providers: Providers = []) -> Callable[[type],
     return wrapped
 
 
-def inject(token: InjectToken) -> InjectedMetaclass:
-    return InjectedMetaclass(token)
+def inject(token: InjectToken) -> InjectedDelegate:
+    return InjectedDelegate(token)
 
 
-def root(cls: type) -> IModuleContainer:
+def root(cls: type) -> IModuleDelegate:
     if cls.__annotations__.get(_MODULE_ANNOTATIONS) is None:
         raise NotAPyDIModule(cls.__name__)
 
-    m = ModuleContainer(cls, None)
+    m = ModuleDelegate(cls, None)
     m.on_boot()
     m.on_post_boot()
 

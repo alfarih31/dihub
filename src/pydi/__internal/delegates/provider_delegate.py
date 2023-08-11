@@ -1,13 +1,13 @@
 from typing import Self, Union, Optional, Tuple, List
 
-from pydi.__internal.provider_proxy import ProviderProxy
+from pydi.__internal.proxies.provider_proxy import ProviderProxy
+from pydi.annotations import ProviderAnnotation
 from pydi.constants import _PROVIDER_ANNOTATIONS
 from pydi.exceptions import NotAPyDIProvider
-from pydi.provider_annotations import ProviderAnnotation
 from pydi.typing import Providers, InjectToken
 
 
-class ProviderContainer:
+class ProviderDelegate:
     __providers: List[ProviderProxy]
     __iter_index = -1
 
@@ -26,7 +26,7 @@ class ProviderContainer:
         return "[%s]" % (", ".join(members_str))
 
     def __add__(self, other: Union[Self, Providers]):
-        if isinstance(other, ProviderContainer):
+        if isinstance(other, ProviderDelegate):
             self.__providers += other.__providers
         else:
             self.__providers += other

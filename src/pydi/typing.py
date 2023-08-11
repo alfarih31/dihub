@@ -38,7 +38,7 @@ Providers: TypeAlias = List[Provide]
 Modules: TypeAlias = List[type]
 
 
-class IModuleContainer(ABC):
+class IModuleDelegate(ABC):
     @abstractmethod
     def __getitem__(self, attr: Tuple[Union[type, Self], InjectToken]) -> Optional[Provide]: ...
 
