@@ -1,23 +1,20 @@
 from copy import deepcopy
 from inspect import getmembers, isclass
-from typing import Any
+from typing import Any, Type
 
-from pydi.typing import Provide
+from pydi.types import Value, IProviderProxy
 
 
-class ProviderProxy:
-    __provide: Provide
+class ProviderProxy(IProviderProxy):
+    __provide: Value
     __ACTUAL_INIT = "__ACTUAL_INIT"
 
-    def __init__(self, provide: Provide):
+    def __init__(self, provide: Value):
         if isclass(provide):
             setattr(provide, self.__ACTUAL_INIT, provide.__init__)
             provide.__init__ = lambda *args: None
 
         self.__provide = provide
-
-    # def __get__(self, *args, **kwargs):
-    #     return self.__provide
 
     def __str__(self):
         return "<%s %s>" % (self.__repr__(), str(self.__provide))
@@ -25,10 +22,14 @@ class ProviderProxy:
     def __eq__(self, other: Any):
         if isinstance(other, ProviderProxy):
             return self.__provide == other.__provide
-        elif isinstance(other, type):
-            return self.__provide == other
 
         return False
+
+    def deep_eq(self, other: Any) -> bool:
+        if not self.__eq__(other):
+            return False
+
+        return id(self.__provide) == id(other.__provide)
 
     def on_boot(self):
         if isclass(self.__provide):
@@ -44,6 +45,11 @@ class ProviderProxy:
             if hasattr(self.__provide, self.__ACTUAL_INIT):
                 getattr(self.__provide, self.__ACTUAL_INIT)()
 
+    def cast(self, metaclass: Type[Value]) -> Value:
+        if isinstance(self.__provide, metaclass):
+            return self
+        raise TypeError("Can't cast, the provider %s doesn't implement '%s'" % (self.__provide, metaclass.__name__))
+
     def __getattr__(self, item):
         return getattr(self.__provide, item)
 
@@ -55,5 +61,5 @@ class ProviderProxy:
         return ProviderProxy(deepcopy(self.__provide))
 
     @property
-    def provide(self) -> Provide:
+    def provide(self) -> Value:
         return self.__provide

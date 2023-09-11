@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydi.typing import _as_primitive
+from pydi.types import _as_primitive
 
 
 class PrimitiveProxy:

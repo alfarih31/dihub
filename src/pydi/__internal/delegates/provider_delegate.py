@@ -1,13 +1,12 @@
-from typing import Self, Union, Optional, Tuple, List
+from typing import Union, Tuple, List
 
-from pydi.__internal.proxies.provider_proxy import ProviderProxy
-from pydi.annotations import ProviderAnnotation
+from pydi.__internal.proxies import ProviderProxy
 from pydi.constants import _PROVIDER_ANNOTATIONS
-from pydi.exceptions import NotAPyDIProvider
-from pydi.typing import Providers, InjectToken
+from pydi.exceptions import NotAPyDIProvider, ProviderNotFound
+from pydi.types import Providers, InjectToken, IProviderDelegate, ProviderAnnotation
 
 
-class ProviderDelegate:
+class ProviderDelegate(IProviderDelegate):
     __providers: List[ProviderProxy]
     __iter_index = -1
 
@@ -25,7 +24,7 @@ class ProviderDelegate:
             members_str.append(str(i))
         return "[%s]" % (", ".join(members_str))
 
-    def __add__(self, other: Union[Self, Providers]):
+    def __add__(self, other: Union[IProviderDelegate, Providers]):
         if isinstance(other, ProviderDelegate):
             self.__providers += other.__providers
         else:
@@ -47,13 +46,13 @@ class ProviderDelegate:
             return p, annotations
         raise StopIteration
 
-    def __getitem__(self, token: InjectToken) -> Tuple[Optional[ProviderProxy], Optional[ProviderAnnotation]]:
+    def __getitem__(self, token: InjectToken) -> Tuple[ProviderProxy, ProviderAnnotation]:
         for p in self.__providers:
             annotations: ProviderAnnotation = p.provide.__annotations__.get(_PROVIDER_ANNOTATIONS)
             if annotations.token == token:
                 return p, annotations
 
-        return None, None
+        raise ProviderNotFound(token)
 
     def __delitem__(self, token: InjectToken):
         for i, p in enumerate(self.__providers):

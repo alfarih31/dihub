@@ -26,3 +26,13 @@ class AnnotationsNotSupported(TypeError):
 class CannotResolveDependency(RuntimeError):
     def __init__(self, dep_name: str, at: str):
         super().__init__("Cannot resolve %s at %s" % (dep_name, at))
+
+
+class ProviderNotFound(KeyError):
+    def __init__(self, token: str):
+        super().__init__("Provider with token '%s' not found" % token)
+
+
+class ModuleNotFound(KeyError):
+    def __init__(self, module: type):
+        super().__init__("Module '%s' not found" % str(module))
