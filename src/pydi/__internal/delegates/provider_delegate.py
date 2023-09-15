@@ -1,8 +1,9 @@
 from typing import Union, Tuple, List
 
+from pydi.__internal.helpers import AnnotationOf, validate_pydi_provider
 from pydi.__internal.proxies import ProviderProxy
 from pydi.constants import _PROVIDER_ANNOTATIONS
-from pydi.exceptions import NotAPyDIProvider, ProviderNotFound
+from pydi.exceptions import ProviderNotFound
 from pydi.types import Providers, InjectToken, IProviderDelegate, ProviderAnnotation
 
 
@@ -13,8 +14,7 @@ class ProviderDelegate(IProviderDelegate):
     def __init__(self, providers: Providers):
         self.__providers = []
         for i in providers:
-            if i.__annotations__.get(_PROVIDER_ANNOTATIONS) is None:
-                raise NotAPyDIProvider(i.__name__)
+            validate_pydi_provider(i)
 
             self.__providers.append(ProviderProxy(i))
 
@@ -42,21 +42,28 @@ class ProviderDelegate(IProviderDelegate):
         if self.__iter_index < len(self.__providers) - 1:
             self.__iter_index += 1
             p = self.__providers[self.__iter_index]
-            annotations: ProviderAnnotation = p.provide.__annotations__.get(_PROVIDER_ANNOTATIONS)
+            annotations = AnnotationOf(p.provide).get(_PROVIDER_ANNOTATIONS, ProviderAnnotation)
             return p, annotations
         raise StopIteration
 
     def __getitem__(self, token: InjectToken) -> Tuple[ProviderProxy, ProviderAnnotation]:
         for p in self.__providers:
-            annotations: ProviderAnnotation = p.provide.__annotations__.get(_PROVIDER_ANNOTATIONS)
-            if annotations.token == token:
+            annotations = AnnotationOf(p.provide).get(_PROVIDER_ANNOTATIONS, ProviderAnnotation)
+
+            is_match = False
+            if isinstance(token, type):
+                is_match = annotations.token == token.__name__
+            else:
+                is_match = annotations.token == token
+
+            if is_match:
                 return p, annotations
 
         raise ProviderNotFound(token)
 
     def __delitem__(self, token: InjectToken):
         for i, p in enumerate(self.__providers):
-            annotations: ProviderAnnotation = p.provide.__annotations__.get(_PROVIDER_ANNOTATIONS)
+            annotations = AnnotationOf(p.provide).get(_PROVIDER_ANNOTATIONS, ProviderAnnotation)
             if annotations.token == token:
                 del self.__providers[i]
                 return

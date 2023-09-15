@@ -1,10 +1,10 @@
 from inspect import getmembers
 from typing import Optional, Self, Any, Tuple, List
 
+from pydi.__internal.helpers import AnnotationOf, validate_pydi_module
 from pydi.__internal.proxies import ProviderProxy
 from pydi.constants import _MODULE_ANNOTATIONS, ProviderScope
 from pydi.exceptions import (
-    NotAPyDIModule,
     CannotResolveDependency,
     ModuleNotFound,
     ProviderNotFound,
@@ -21,28 +21,27 @@ from .provider_delegate import ProviderDelegate
 
 
 class ModuleDelegate(IModuleDelegate):
-    __base_module: type
+    __base_class: type
     __providers: ProviderDelegate
     __imported_modules_delegate: List[IModuleDelegate]
     __root_delegate: Self
     __for_root_imports: List[IModuleDelegate]
 
     def __init__(self, module: type, root_delegate: Optional[Self]):
-        self.__base_module = module
+        validate_pydi_module(module)
 
-        annotations: Optional[ModuleAnnotation] = module.__annotations__.get(
-            _MODULE_ANNOTATIONS
+        annotations = AnnotationOf(module).get(
+            _MODULE_ANNOTATIONS, ModuleAnnotation
         )
-        if annotations is None:
-            raise NotAPyDIModule(module.__str__())
 
+        self.__base_class = module
         self.__root_delegate = root_delegate
         self.__providers = ProviderDelegate(annotations.providers)
         self.__imported_modules_delegate = [ModuleDelegate(m, self) for m in annotations.imports]
 
         self.__for_root_imports = []
         for md in self.__imported_modules_delegate:
-            md_annotations: ModuleAnnotation = md.base_module.__annotations__.get(_MODULE_ANNOTATIONS)
+            md_annotations = AnnotationOf(md.base_class).get(_MODULE_ANNOTATIONS, ModuleAnnotation)
             if md_annotations.for_root:
                 self.__for_root_imports.append(md)
 
@@ -59,17 +58,21 @@ class ModuleDelegate(IModuleDelegate):
             imports_str.append(i.__str__())
         return "<%s%s<imports [%s]>>" % (
             self.__repr__(),
-            str(self.__base_module),
+            str(self.__base_class),
             ",\n".join(imports_str),
         )
 
     def __eq__(self, other: Any):
         if isinstance(other, ModuleDelegate):
-            return self.__base_module == other.__base_module
+            return self.__base_class == other.__base_class
         elif isinstance(other, type):
-            return self.__base_module == other
+            return self.__base_class == other
 
         return False
+
+    def __setattr__(self, key, value):
+        super(ModuleDelegate, self).__setattr__(key, value)
+        setattr(self.__base_class, key, value)
 
     def deep_eq(self, other: Any) -> bool:
         if not self.__eq__(other):
@@ -130,11 +133,14 @@ class ModuleDelegate(IModuleDelegate):
                         except ProviderNotFound:
                             continue
 
-                if dependency is None:
+                if not self.is_root and dependency is None:
                     try:
                         dependency, annotations = self.root_delegate.get_for_root_provider(injected_dependency.token)
                     except ProviderNotFound:
                         raise CannotResolveDependency(dependency_name, str(provider))
+
+                if dependency is None or annotations is None:
+                    raise CannotResolveDependency(dependency_name, str(provider))
 
                 # Decide how the dependency is resolved
                 if annotations.scope == ProviderScope.LOCAL:
@@ -174,8 +180,8 @@ class ModuleDelegate(IModuleDelegate):
         return self.__providers
 
     @property
-    def base_module(self) -> type:
-        return self.__base_module
+    def base_class(self) -> type:
+        return self.__base_class
 
     @property
     def root_delegate(self) -> Self:

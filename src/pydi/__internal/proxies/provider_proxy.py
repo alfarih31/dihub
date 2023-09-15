@@ -2,18 +2,14 @@ from copy import deepcopy
 from inspect import getmembers, isclass
 from typing import Any, Type
 
-from pydi.types import Value, IProviderProxy
+from pydi.types import Value, IProviderProxy, IProviderRunner
 
 
 class ProviderProxy(IProviderProxy):
     __provide: Value
-    __ACTUAL_INIT = "__ACTUAL_INIT"
+    __AFTER_START_CALLED = False
 
     def __init__(self, provide: Value):
-        if isclass(provide):
-            setattr(provide, self.__ACTUAL_INIT, provide.__init__)
-            provide.__init__ = lambda *args: None
-
         self.__provide = provide
 
     def __str__(self):
@@ -42,13 +38,20 @@ class ProviderProxy(IProviderProxy):
             for _, method in getmembers(self.__provide, predicate=lambda x: isinstance(x, ProviderProxy)):
                 method.on_post_boot()
 
-            if hasattr(self.__provide, self.__ACTUAL_INIT):
-                getattr(self.__provide, self.__ACTUAL_INIT)()
+            if not self.__AFTER_START_CALLED and isinstance(self.__provide, IProviderRunner):
+                self.__provide.after_started()
+                self.__AFTER_START_CALLED = True
 
     def cast(self, metaclass: Type[Value]) -> Value:
         if isinstance(self.__provide, metaclass):
             return self
         raise TypeError("Can't cast, the provider %s doesn't implement '%s'" % (self.__provide, metaclass.__name__))
+
+    def release(self) -> Value:
+        if isinstance(self.__provide, ProviderProxy):
+            return self.__provide.release()
+
+        return self.__provide
 
     def __getattr__(self, item):
         return getattr(self.__provide, item)

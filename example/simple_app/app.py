@@ -9,7 +9,7 @@ from pydi.types import IRootRunner, IModuleDelegate
 class App(IRootRunner):
     var: int
 
-    def after_boot(self, root_app: IModuleDelegate):
+    def after_started(self, root_app: IModuleDelegate):
         person_service = root_app.providers[PERSON_SERVICE][0].cast(IPersonService)
         person_service.register("John Doe")
         all_person = person_service.get_all()

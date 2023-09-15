@@ -10,7 +10,7 @@ from pydi.types import ModuleAnnotation, ProviderAnnotation
 
 class DecoratorsTest(unittest.TestCase):
     def test_module_decorator_should_set_module_annotation(self):
-        @module()
+        @module
         class C: ...
 
         self.assertIn(_MODULE_ANNOTATIONS, C.__annotations__)
@@ -28,22 +28,44 @@ class DecoratorsTest(unittest.TestCase):
         self.assertEqual(c.member.token, "token")
 
     def test_provider_decorator_should_set_provider_annotation(self):
-        @provider("token")
+        @provider(token="token")
         class C: ...
 
         self.assertIn(_PROVIDER_ANNOTATIONS, C.__annotations__)
         self.assertIsInstance(C.__annotations__[_PROVIDER_ANNOTATIONS], ProviderAnnotation)
 
-        @provider("provide")
+        @provider(token="provide")
         def constant_provider() -> str: ...
 
         self.assertIn(_PROVIDER_ANNOTATIONS, constant_provider.__annotations__)
         self.assertIsInstance(constant_provider.__annotations__[_PROVIDER_ANNOTATIONS], ProviderAnnotation)
 
+        @provider
+        class B: ...
+
+        self.assertIn(_PROVIDER_ANNOTATIONS, B.__annotations__)
+        self.assertIsInstance(B.__annotations__[_PROVIDER_ANNOTATIONS], ProviderAnnotation)
+        self.assertIs(B.__annotations__[_PROVIDER_ANNOTATIONS].token, B.__name__)
+
     def test_root_decorator_should_raise_NotAPyDIModule_to_non_module(self):
         with self.assertRaises(NotAPyDIModule):
             @root
             class C: ...
+
+    def test_root_decorator_should_not_affect_class_initialization(self):
+        class OC: ...
+
+        # Implicitly decorate
+        C = module()(OC)
+        C = root(C)
+
+        c1 = C()
+        self.assertIsInstance(c1, OC)
+
+        c2 = C()
+        self.assertIsInstance(c2, OC)
+
+        self.assertNotEqual(c1, c2)
 
     def test_root_decorator_should_wrap_a_class(self):
         class OC: ...
@@ -51,8 +73,6 @@ class DecoratorsTest(unittest.TestCase):
         # Implicitly decorate
         C = module()(OC)
         C = root(C)
-
-        self.assertIsInstance(C, root)
 
         c = C()
         self.assertIsInstance(c, OC)
@@ -91,7 +111,7 @@ class DecoratorsTest(unittest.TestCase):
 
     def test_for_root_decorator_should_set_annotation_to_for_root(self):
         @for_root
-        @module()
+        @module
         class C: ...
 
         annotations: ModuleAnnotation = C.__annotations__.get(_MODULE_ANNOTATIONS)
