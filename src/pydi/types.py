@@ -8,7 +8,7 @@ _Instance = TypeVar('_Instance', bound=type, covariant=True)
 Value = TypeVar("Value", covariant=True)
 Method: TypeAlias = Callable[[_Instance], Value]
 
-InjectToken: TypeAlias = str
+InjectToken = Union[str, type]
 
 _as_class: TypeAlias = type
 _as_primitive: TypeAlias = Union[str, int, bool, float]
@@ -30,6 +30,9 @@ class IProviderProxy(ABC):
 
     @abstractmethod
     def cast(self, metaclass: Type[Value]) -> Value: ...
+
+    @abstractmethod
+    def release(self) -> Value: ...
 
 
 Providers: TypeAlias = List[Provide]
@@ -67,7 +70,7 @@ class IModuleDelegate(ABC):
 
     @property
     @abstractmethod
-    def base_module(self) -> type: ...
+    def base_class(self) -> type: ...
 
     @property
     @abstractmethod
@@ -95,4 +98,17 @@ class ModuleAnnotation:
 
 class IRootRunner(ABC):
     @abstractmethod
-    def after_boot(self, module_delegate: IModuleDelegate): ...
+    def after_started(self, module_delegate: IModuleDelegate): ...
+
+
+class IRootPlugin(ABC):
+    @abstractmethod
+    def __call__(self, root_module_delegate: IModuleDelegate): ...
+
+
+Plugins = List[IRootPlugin]
+
+
+class IProviderRunner(ABC):
+    @abstractmethod
+    def after_started(self): ...
