@@ -36,3 +36,8 @@ class ProviderNotFound(KeyError):
 class ModuleNotFound(KeyError):
     def __init__(self, module: type):
         super().__init__("Module '%s' not found" % str(module))
+
+
+class ReservedInjectToken(ValueError):
+    def __init__(self, token: str):
+        super().__init__("Inject token '%s' is reserved" % token)
