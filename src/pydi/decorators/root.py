@@ -1,3 +1,4 @@
+from inspect import iscoroutinefunction
 from typing import Type
 
 from pydi.__internal.delegates import ModuleDelegate
@@ -20,7 +21,14 @@ def __process_root_decorator(cls: Value, plugins: Plugins) -> Type[Value]:
         base_class_instance = __module_delegate.base_class(*args, **kwargs)
 
         if isinstance(base_class_instance, IRootRunner):
-            base_class_instance.after_started(__module_delegate)
+            if iscoroutinefunction(base_class_instance.after_started):
+                async def after_started_coro(instance: IRootRunner):
+                    await instance.after_started(__module_delegate)
+                    return instance
+
+                return after_started_coro(base_class_instance)
+            else:
+                base_class_instance.after_started(__module_delegate)
 
         return base_class_instance
 
