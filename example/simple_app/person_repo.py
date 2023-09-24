@@ -19,7 +19,7 @@ class IPersonRepo(ABC):
 
 
 @export
-@provider(PERSON_REPO)
+@provider(token=PERSON_REPO)
 class __PersonRepo(IPersonRepo):
     __in_memory: Set[Person]
 

@@ -13,8 +13,8 @@ class AppTest(TestCase):
 
     def setUp(self) -> None:
         root_app = App()
-        self.B_MODULE_REF = root_app[BModule]
-        self.A_MODULE_REF = root_app[AModule]
+        self.B_MODULE_REF = root_app.root_ref[BModule]
+        self.A_MODULE_REF = root_app.root_ref[AModule]
 
     def test_global_scoped_provider(self):
         """Global scoped should be shared"""

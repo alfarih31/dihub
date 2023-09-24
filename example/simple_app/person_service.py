@@ -19,7 +19,7 @@ class IPersonService(ABC):
     def get_all(self) -> List[Person]: ...
 
 
-@provider(PERSON_SERVICE)
+@provider(token=PERSON_SERVICE)
 class __PersonService(IPersonService):
     person_repo: IPersonRepo = inject(PERSON_REPO)
 

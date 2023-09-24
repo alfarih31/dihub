@@ -15,7 +15,7 @@ class IBService(ABC):
 
 
 @export
-@provider(BService)
+@provider(token=BService)
 class __BService(IBService):
     global_a_service: IAService = inject(GlobalScopedAService)
     module_a_service: IAService = inject(ModuleScopedAService)
