@@ -16,6 +16,9 @@ class ASGI(IRootPlugin):
         return await self.asgi_provider(*args, **kwargs)
 
     def __call__(self, root_module_delegate: IModuleDelegate):
+        if not root_module_delegate.is_root:
+            raise ValueError("module is not root")
+
         if self.from_module is not None:
             self.asgi_provider = root_module_delegate[self.from_module].providers[self.from_provider][0].release()
         else:
