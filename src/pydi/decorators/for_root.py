@@ -1,10 +1,10 @@
 from pydi.__internal.helpers import AnnotationOf, validate_pydi_module
 
 from pydi.constants import _MODULE_ANNOTATIONS
-from pydi.types import ModuleAnnotation, _Instance
+from pydi.types import ModuleAnnotation, Instance
 
 
-def for_root(m: _Instance) -> _Instance:
+def for_root(m: Instance) -> Instance:
     validate_pydi_module(m)
 
     module_annotations = AnnotationOf(m).get(_MODULE_ANNOTATIONS, ModuleAnnotation)

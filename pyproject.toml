@@ -3,7 +3,7 @@ name = "pydi"
 version = "0.1.0"
 description = "A dependency injection framework for Python"
 authors = ["Alfarih Faza <alfarihfz@gmail.com>"]
-license = "MIT"
+license = "BSD"
 readme = "README.md"
 
 [tool.poetry.dependencies]

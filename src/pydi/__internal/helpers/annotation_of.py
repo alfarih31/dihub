@@ -1,10 +1,7 @@
-from types import FunctionType, LambdaType
-from typing import Union, Any, Type, Optional
+from typing import Any, Type, Optional
 
 from pydi.exceptions import AnnotationsNotSupported
-from pydi.types import Value
-
-NOTABLE = Union[type, FunctionType, LambdaType]
+from pydi.types import Value, NOTABLE
 
 
 def is_primitive(obj):

@@ -1,12 +1,26 @@
 from abc import abstractmethod, ABC
 from dataclasses import dataclass
-from typing import TypeAlias, TypeVar, Callable, List, Union, Self, Tuple, Optional, Any, Type
+from types import FunctionType, LambdaType
+from typing import TypeAlias, TypeVar, Callable, List, Union, Self, Tuple, Optional, Any, Type, Protocol
 
 from .constants import ProviderScope
 
-_Instance = TypeVar('_Instance', bound=type, covariant=True)
 Value = TypeVar("Value", covariant=True)
-Method: TypeAlias = Callable[[_Instance], Value]
+Config = TypeVar("Config", covariant=True)
+
+
+class Configurable(Protocol[Config, Value]):
+    @classmethod
+    def configure(cls, config: Config) -> Value: ...
+
+    @abstractmethod
+    def __call__(self, *args, **kwargs) -> Value: ...
+
+
+Instance = TypeVar('Instance', type, Configurable, covariant=True)
+Method: TypeAlias = Callable[[Instance], Value]
+
+NOTABLE = Union[type, FunctionType, LambdaType]
 
 InjectToken = Union[str, type]
 
@@ -15,7 +29,11 @@ _as_primitive: TypeAlias = Union[str, int, bool, float]
 
 Provide = TypeVar("Provide", covariant=True)
 
-Modules: TypeAlias = List[type]
+Modules: TypeAlias = List[Instance]
+
+
+def is_notable(obj) -> bool:
+    return isinstance(obj, FunctionType) or isinstance(obj, LambdaType) or isinstance(obj, type)
 
 
 class IProviderProxy(ABC):
@@ -51,8 +69,12 @@ class IProviderDelegate(ABC):
 
 
 class IModuleDelegate(ABC):
+    @property
     @abstractmethod
-    def __getitem__(self, module: type) -> Self: ...
+    def is_root(self) -> bool: ...
+
+    @abstractmethod
+    def __getitem__(self, module: Instance) -> Self: ...
 
     @abstractmethod
     def __call__(self, *args, **kwargs) -> Self: ...
@@ -66,7 +88,7 @@ class IModuleDelegate(ABC):
 
     @property
     @abstractmethod
-    def for_root_imports(self) -> List[Self]: ...
+    def imports(self) -> List[Self]: ...
 
     @property
     @abstractmethod
@@ -75,6 +97,10 @@ class IModuleDelegate(ABC):
     @property
     @abstractmethod
     def root_delegate(self) -> Self: ...
+
+    @property
+    @abstractmethod
+    def parent_delegate(self) -> Self: ...
 
     @abstractmethod
     def on_boot(self): ...
@@ -97,8 +123,21 @@ class ModuleAnnotation:
 
 
 class IRootRunner(ABC):
+    def __await__(self): ...
+
     @abstractmethod
-    def after_started(self, module_delegate: IModuleDelegate): ...
+    def after_started(self, root_module_delegate: IModuleDelegate): ...
+
+
+class IConfigurableModule(Protocol[Value]):
+    __config: Value
+
+    @property
+    def config(self) -> Value:
+        return self.__config
+
+    def configure(self, config: Value):
+        self.__config = config
 
 
 class IRootPlugin(ABC):

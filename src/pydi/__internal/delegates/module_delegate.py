@@ -3,7 +3,7 @@ from typing import Optional, Self, Any, Tuple, List
 
 from pydi.__internal.helpers import AnnotationOf, validate_pydi_module
 from pydi.__internal.proxies import ProviderProxy
-from pydi.constants import _MODULE_ANNOTATIONS, ProviderScope
+from pydi.constants import _MODULE_ANNOTATIONS, ProviderScope, ROOT_MODULE_DELEGATE
 from pydi.exceptions import (
     CannotResolveDependency,
     ModuleNotFound,
@@ -15,6 +15,7 @@ from pydi.types import (
     IProviderDelegate,
     ModuleAnnotation,
     ProviderAnnotation,
+    Instance,
 )
 from .injected_delegate import InjectedDelegate
 from .provider_delegate import ProviderDelegate
@@ -24,10 +25,10 @@ class ModuleDelegate(IModuleDelegate):
     __base_class: type
     __providers: ProviderDelegate
     __imported_modules_delegate: List[IModuleDelegate]
-    __root_delegate: Self
+    __parent_delegate: Self
     __for_root_imports: List[IModuleDelegate]
 
-    def __init__(self, module: type, root_delegate: Optional[Self]):
+    def __init__(self, module: type, parent_delegate: Optional[Self]):
         validate_pydi_module(module)
 
         annotations = AnnotationOf(module).get(
@@ -35,7 +36,7 @@ class ModuleDelegate(IModuleDelegate):
         )
 
         self.__base_class = module
-        self.__root_delegate = root_delegate
+        self.__parent_delegate = parent_delegate
         self.__providers = ProviderDelegate(annotations.providers)
         self.__imported_modules_delegate = [ModuleDelegate(m, self) for m in annotations.imports]
 
@@ -47,7 +48,7 @@ class ModuleDelegate(IModuleDelegate):
 
     @property
     def is_root(self) -> bool:
-        return self.__root_delegate is None
+        return self.__parent_delegate is None
 
     def __call__(self, *args, **kwargs):
         return self
@@ -79,7 +80,7 @@ class ModuleDelegate(IModuleDelegate):
             return False
         return id(other) == id(self)
 
-    def __getitem__(self, module: type) -> IModuleDelegate:
+    def __getitem__(self, module: Instance) -> IModuleDelegate:
         for m in self.__imported_modules_delegate:
             if m == module:
                 return m
@@ -103,18 +104,30 @@ class ModuleDelegate(IModuleDelegate):
             except ProviderNotFound:
                 continue
 
-        if self.root_delegate is None:
+        if self.parent_delegate is None:
             raise ProviderNotFound(token)
 
-        return self.root_delegate.get_for_root_provider(token)
+        return self.parent_delegate.get_for_root_provider(token)
 
     def __resolve_providers_dependencies(self):
+        def resolve_root_module_delegate(provider: ProviderProxy, attribute_name: str, injected_delegate: InjectedDelegate) -> bool:
+            if isinstance(injected_delegate.token, str) and injected_delegate.token == ROOT_MODULE_DELEGATE:
+                setattr(provider.provide, attribute_name, self.root_delegate)
+
+                return True
+
+            return False
+
         for provider, _ in self.__providers:
             for dependency_name, injected_dependency in getmembers(
                     provider.provide, predicate=lambda x: isinstance(x, InjectedDelegate)
             ):
+                if resolve_root_module_delegate(provider, dependency_name, injected_dependency):
+                    continue
+
                 dependency: Optional[ProviderProxy] = None
                 annotations: Optional[ProviderAnnotation] = None
+
                 # Resolve from self
                 try:
                     dependency, annotations = self.__providers[
@@ -135,7 +148,7 @@ class ModuleDelegate(IModuleDelegate):
 
                 if not self.is_root and dependency is None:
                     try:
-                        dependency, annotations = self.root_delegate.get_for_root_provider(injected_dependency.token)
+                        dependency, annotations = self.parent_delegate.get_for_root_provider(injected_dependency.token)
                     except ProviderNotFound:
                         raise CannotResolveDependency(dependency_name, str(provider))
 
@@ -185,8 +198,15 @@ class ModuleDelegate(IModuleDelegate):
 
     @property
     def root_delegate(self) -> Self:
-        return self.__root_delegate
+        if not self.is_root:
+            return self.parent_delegate.root_delegate
+
+        return self
 
     @property
-    def for_root_imports(self) -> List[Self]:
-        return self.__for_root_imports
+    def parent_delegate(self) -> Self:
+        return self.__parent_delegate
+
+    @property
+    def imports(self) -> List[Self]:
+        return self.__imported_modules_delegate
