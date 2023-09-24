@@ -1,22 +1,27 @@
 from inspect import isfunction
 
 from pydi.__internal.helpers import AnnotationOf
-
 from pydi.__internal.proxies import PrimitiveProxy
-from pydi.constants import ProviderScope, _PROVIDER_ANNOTATIONS
+from pydi.constants import ProviderScope, _PROVIDER_ANNOTATIONS, ROOT_MODULE_DELEGATE
+from pydi.exceptions import ReservedInjectToken
 from pydi.types import InjectToken, Value, ProviderAnnotation
 
 
 def __process_provider_decorator(provide: Value, token: InjectToken, scope: ProviderScope):
     if isfunction(provide):
-        provide = PrimitiveProxy(provide())
+        provide = PrimitiveProxy(provide.__name__, provide())
 
     final_token = token
     if final_token is None:
-        if isinstance(provide, type):
+        if isinstance(provide, PrimitiveProxy):
+            final_token = provide.__name__
+        elif isinstance(provide, type):
             final_token = provide.__name__
         else:
             final_token = provide.__class__.__name__
+
+    if final_token == ROOT_MODULE_DELEGATE:
+        raise ReservedInjectToken(final_token)
 
     AnnotationOf(provide).set(_PROVIDER_ANNOTATIONS, ProviderAnnotation(token=final_token, scope=scope))
     return provide
