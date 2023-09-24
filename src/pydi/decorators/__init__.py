@@ -1,3 +1,4 @@
+from .configurable import configurable
 from .export import export
 from .for_root import for_root
 from .inject import inject
