@@ -1,3 +1,3 @@
-# PyDI
+# DIHub
 
-A dependency injection framework for Python
+DIHub is a dependency injection framework for Python
