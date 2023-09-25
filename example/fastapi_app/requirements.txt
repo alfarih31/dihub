@@ -6,7 +6,7 @@ cffi==1.15.1
 charset-normalizer==3.2.0
 cleo==2.0.1
 crashtest==0.4.1
--e git+ssh://git@github.com/alfarih31/pydi.git@1b0259ef323f0eb98ec4cc4ba897b0a69d39bf33#egg=dihub
+-e git+ssh://git@github.com/alfarih31/dihub.git@123f46a5a0926477a3236fde4699598e582388d2#egg=dihub
 distlib==0.3.7
 dulwich==0.21.6
 filelock==3.12.4
