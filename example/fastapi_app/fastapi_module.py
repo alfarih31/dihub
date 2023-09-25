@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from pydi.decorators import provider, export, module
+from dihub.decorators import provider, export, module
 
 
 @export

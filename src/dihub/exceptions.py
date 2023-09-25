@@ -10,12 +10,12 @@ class MissingArgumentException(ValueError):
 
 class NotAPyDIModule(ValueError):
     def __init__(self, name: str):
-        super().__init__("this: %s, not a pydi module" % name)
+        super().__init__("this: %s, not a dihub module" % name)
 
 
 class NotAPyDIProvider(ValueError):
     def __init__(self, name: str):
-        super().__init__("this: %s, not a pydi provider" % name)
+        super().__init__("this: %s, not a dihub provider" % name)
 
 
 class AnnotationsNotSupported(TypeError):

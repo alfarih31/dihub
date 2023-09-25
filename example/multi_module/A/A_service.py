@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from pydi.constants import ProviderScope
-from pydi.decorators import provider, export
+from dihub.constants import ProviderScope
+from dihub.decorators import provider, export
 
 GlobalScopedAService = "GlobalScopedAService"
 ModuleScopedAService = "ModuleScopedAService"

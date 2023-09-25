@@ -1,7 +1,7 @@
 from fastapi_module import FastAPIProvider
-from pydi.decorators import inject
-from pydi.decorators import provider
-from pydi.types import IProviderRunner
+from dihub.decorators import inject
+from dihub.decorators import provider
+from dihub.types import IProviderRunner
 
 
 @provider

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "pydi"
+name = "dihub"
 version = "0.1.0"
-description = "A dependency injection framework for Python"
+description = "DIHub is a dependency injection framework for Python"
 authors = ["Alfarih Faza <alfarihfz@gmail.com>"]
 license = "BSD"
 readme = "README.md"

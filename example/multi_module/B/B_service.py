@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from A import GlobalScopedAService, ModuleScopedAService, LocalScopedAService, IAService
 
-from pydi.decorators import provider, export, inject
+from dihub.decorators import provider, export, inject
 
 BService = "BService"
 

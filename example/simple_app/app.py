@@ -1,7 +1,7 @@
 from person_repo import __PersonRepo
 from person_service import __PersonService, PERSON_SERVICE, IPersonService
-from pydi.decorators import module, root
-from pydi.types import IRootRunner, IModuleDelegate
+from dihub.decorators import module, root
+from dihub.types import IRootRunner, IModuleDelegate
 
 
 @root

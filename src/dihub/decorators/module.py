@@ -1,9 +1,9 @@
 from typing import List, Any, Callable, Union
 
-from pydi.__internal.helpers import AnnotationOf
+from dihub.__internal.helpers import AnnotationOf
 
-from pydi.constants import _MODULE_ANNOTATIONS
-from pydi.types import Value, Providers, Modules, ModuleAnnotation
+from dihub.constants import _MODULE_ANNOTATIONS
+from dihub.types import Value, Providers, Modules, ModuleAnnotation
 
 
 def __get_list_defaults(arr: List[Any]) -> List[Any]:

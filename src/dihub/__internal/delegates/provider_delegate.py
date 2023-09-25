@@ -1,10 +1,10 @@
 from typing import Union, Tuple, List
 
-from pydi.__internal.helpers import AnnotationOf, validate_pydi_provider
-from pydi.__internal.proxies import ProviderProxy
-from pydi.constants import _PROVIDER_ANNOTATIONS
-from pydi.exceptions import ProviderNotFound
-from pydi.types import Providers, InjectToken, IProviderDelegate, ProviderAnnotation, Provide
+from dihub.__internal.helpers import AnnotationOf, validate_dihub_provider
+from dihub.__internal.proxies import ProviderProxy
+from dihub.constants import _PROVIDER_ANNOTATIONS
+from dihub.exceptions import ProviderNotFound
+from dihub.types import Providers, InjectToken, IProviderDelegate, ProviderAnnotation, Provide
 
 
 class ProviderDelegate(IProviderDelegate):
@@ -14,7 +14,7 @@ class ProviderDelegate(IProviderDelegate):
     def __init__(self, providers: Providers):
         self.__providers = []
         for i in providers:
-            validate_pydi_provider(i)
+            validate_dihub_provider(i)
 
             self.__providers.append(ProviderProxy(i))
 
@@ -29,7 +29,7 @@ class ProviderDelegate(IProviderDelegate):
             self.__providers += other.__providers
         else:
             for p in other:
-                validate_pydi_provider(p)
+                validate_dihub_provider(p)
                 self.__providers.append(ProviderProxy(p))
 
         return self
@@ -41,7 +41,7 @@ class ProviderDelegate(IProviderDelegate):
         if isinstance(item, ProviderProxy):
             self.__providers.append(item)
         else:
-            validate_pydi_provider(item)
+            validate_dihub_provider(item)
             self.__providers.append(ProviderProxy(item))
         return self
 

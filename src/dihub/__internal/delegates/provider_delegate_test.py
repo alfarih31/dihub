@@ -2,9 +2,9 @@ import unittest
 from collections.abc import Iterable
 from unittest.mock import MagicMock
 
-from pydi.__internal.proxies import ProviderProxy
-from pydi.decorators import provider
-from pydi.exceptions import NotAPyDIProvider, ProviderNotFound
+from dihub.__internal.proxies import ProviderProxy
+from dihub.decorators import provider
+from dihub.exceptions import NotAPyDIProvider, ProviderNotFound
 from .provider_delegate import ProviderDelegate
 
 

@@ -1,13 +1,13 @@
 from inspect import iscoroutinefunction
 from typing import Type
 
-from pydi.__internal.delegates import ModuleDelegate
-from pydi.__internal.helpers import validate_pydi_module
-from pydi.types import Value, IRootRunner, Plugins
+from dihub.__internal.delegates import ModuleDelegate
+from dihub.__internal.helpers import validate_dihub_module
+from dihub.types import Value, IRootRunner, Plugins
 
 
 def __process_root_decorator(cls: Value, plugins: Plugins) -> Type[Value]:
-    validate_pydi_module(cls)
+    validate_dihub_module(cls)
 
     def __call__(*args, **kwargs):
         __module_delegate = ModuleDelegate(cls, None)

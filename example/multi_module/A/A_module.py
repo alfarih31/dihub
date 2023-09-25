@@ -1,4 +1,4 @@
-from pydi.decorators import module
+from dihub.decorators import module
 
 from .A_service import __GlobalScopedAService, __ModuleScopedAService, __LocalScopedAService
 

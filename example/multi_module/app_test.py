@@ -3,8 +3,8 @@ from unittest import TestCase, main
 from A import AModule, GlobalScopedAService, ModuleScopedAService, LocalScopedAService
 from B import BModule, BService, IBService
 from app import App
-from pydi.exceptions import ProviderNotFound
-from pydi.types import IModuleDelegate
+from dihub.exceptions import ProviderNotFound
+from dihub.types import IModuleDelegate
 
 
 class AppTest(TestCase):

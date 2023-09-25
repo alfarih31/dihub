@@ -1,15 +1,15 @@
 from inspect import getmembers
 from typing import Optional, Self, Any, Tuple, List
 
-from pydi.__internal.helpers import AnnotationOf, validate_pydi_module
-from pydi.__internal.proxies import ProviderProxy
-from pydi.constants import _MODULE_ANNOTATIONS, ProviderScope, ROOT_MODULE_DELEGATE
-from pydi.exceptions import (
+from dihub.__internal.helpers import AnnotationOf, validate_dihub_module
+from dihub.__internal.proxies import ProviderProxy
+from dihub.constants import _MODULE_ANNOTATIONS, ProviderScope, ROOT_MODULE_DELEGATE
+from dihub.exceptions import (
     CannotResolveDependency,
     ModuleNotFound,
     ProviderNotFound,
 )
-from pydi.types import (
+from dihub.types import (
     InjectToken,
     IModuleDelegate,
     IProviderDelegate,
@@ -29,7 +29,7 @@ class ModuleDelegate(IModuleDelegate):
     __for_root_imports: List[IModuleDelegate]
 
     def __init__(self, module: type, parent_delegate: Optional[Self]):
-        validate_pydi_module(module)
+        validate_dihub_module(module)
 
         annotations = AnnotationOf(module).get(
             _MODULE_ANNOTATIONS, ModuleAnnotation

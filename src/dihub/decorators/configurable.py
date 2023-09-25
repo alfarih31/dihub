@@ -1,9 +1,9 @@
 from copy import deepcopy
 from typing import Callable, Type
 
-from pydi.__internal.helpers import AnnotationOf
-from pydi.constants import _MODULE_ANNOTATIONS
-from pydi.types import Value, ModuleAnnotation, Configurable, Config
+from dihub.__internal.helpers import AnnotationOf
+from dihub.constants import _MODULE_ANNOTATIONS
+from dihub.types import Value, ModuleAnnotation, Configurable, Config
 from .provider import provider
 
 

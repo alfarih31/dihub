@@ -1,6 +1,6 @@
 from typing import Callable, Awaitable
 
-from pydi.types import IRootPlugin, IModuleDelegate, InjectToken
+from dihub.types import IRootPlugin, IModuleDelegate, InjectToken
 
 
 class ASGI(IRootPlugin):

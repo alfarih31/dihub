@@ -1,5 +1,5 @@
 from .annotation_of import AnnotationOf
 from .validator import (
-    validate_pydi_provider,
-    validate_pydi_module
+    validate_dihub_provider,
+    validate_dihub_module
 )

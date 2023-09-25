@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Set
 
 from person import Person
-from pydi.decorators import export, provider
+from dihub.decorators import export, provider
 
 PERSON_REPO = "PERSON_REPO"
 

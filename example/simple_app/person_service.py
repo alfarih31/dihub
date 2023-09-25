@@ -3,7 +3,7 @@ from typing import List
 
 from person import Person
 from person_repo import IPersonRepo, PERSON_REPO
-from pydi.decorators import inject, provider
+from dihub.decorators import inject, provider
 
 PERSON_SERVICE = "PERSON_SERVICE"
 

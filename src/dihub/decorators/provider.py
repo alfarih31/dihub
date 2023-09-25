@@ -1,10 +1,10 @@
 from inspect import isfunction
 
-from pydi.__internal.helpers import AnnotationOf
-from pydi.__internal.proxies import PrimitiveProxy
-from pydi.constants import ProviderScope, _PROVIDER_ANNOTATIONS, ROOT_MODULE_DELEGATE
-from pydi.exceptions import ReservedInjectToken
-from pydi.types import InjectToken, Value, ProviderAnnotation
+from dihub.__internal.helpers import AnnotationOf
+from dihub.__internal.proxies import PrimitiveProxy
+from dihub.constants import ProviderScope, _PROVIDER_ANNOTATIONS, ROOT_MODULE_DELEGATE
+from dihub.exceptions import ReservedInjectToken
+from dihub.types import InjectToken, Value, ProviderAnnotation
 
 
 def __process_provider_decorator(provide: Value, token: InjectToken, scope: ProviderScope):

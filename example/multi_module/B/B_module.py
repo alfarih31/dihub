@@ -1,4 +1,4 @@
-from pydi.decorators import module
+from dihub.decorators import module
 
 from .B_service import __BService
 

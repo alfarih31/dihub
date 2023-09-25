@@ -1,7 +1,7 @@
 from A import AModule
 from B import BModule, BService, IBService
-from pydi.decorators import module, root, for_root
-from pydi.types import IRootRunner, IModuleDelegate
+from dihub.decorators import module, root, for_root
+from dihub.types import IRootRunner, IModuleDelegate
 
 
 @root

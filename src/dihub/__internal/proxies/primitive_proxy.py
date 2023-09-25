@@ -1,6 +1,6 @@
 from typing import Any, Generic
 
-from pydi.types import _as_primitive, Value
+from dihub.types import _as_primitive, Value
 
 
 class PrimitiveProxy(Generic[Value]):

@@ -1,7 +1,7 @@
-import pydi.constants
-import pydi.decorators
-import pydi.exceptions
-import pydi.plugins
+import dihub.constants
+import dihub.decorators
+import dihub.exceptions
+import dihub.plugins
 
 __all__ = [
     "types",

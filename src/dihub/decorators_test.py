@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import MagicMock
 
-from pydi.__internal.delegates import InjectedDelegate
-from pydi.constants import _MODULE_ANNOTATIONS, _PROVIDER_ANNOTATIONS
-from pydi.decorators import module, inject, provider, root, export, for_root
-from pydi.exceptions import NotAPyDIModule, NotAPyDIProvider
-from pydi.types import ModuleAnnotation, ProviderAnnotation
+from dihub.__internal.delegates import InjectedDelegate
+from dihub.constants import _MODULE_ANNOTATIONS, _PROVIDER_ANNOTATIONS
+from dihub.decorators import module, inject, provider, root, export, for_root
+from dihub.exceptions import NotAPyDIModule, NotAPyDIProvider
+from dihub.types import ModuleAnnotation, ProviderAnnotation
 
 
 class DecoratorsTest(unittest.TestCase):

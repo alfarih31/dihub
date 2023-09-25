@@ -1,7 +1,7 @@
 from app_controller import AppController
 from fastapi_module import FastAPIModule, FastAPIProvider
-from pydi.decorators import root, module
-from pydi.plugins import ASGI
+from dihub.decorators import root, module
+from dihub.plugins import ASGI
 
 
 @root(plugins=[ASGI(from_module=FastAPIModule, from_provider=FastAPIProvider)])

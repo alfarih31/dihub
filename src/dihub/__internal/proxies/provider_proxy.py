@@ -2,7 +2,7 @@ from copy import deepcopy
 from inspect import getmembers, isclass
 from typing import Any, Type
 
-from pydi.types import Value, IProviderProxy, IProviderRunner
+from dihub.types import Value, IProviderProxy, IProviderRunner
 
 
 class ProviderProxy(IProviderProxy):

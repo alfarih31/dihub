@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from pydi.types import InjectToken
+from dihub.types import InjectToken
 
 
 @dataclass(frozen=True)

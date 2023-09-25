@@ -1,7 +1,7 @@
 from typing import Any, Type, Optional
 
-from pydi.exceptions import AnnotationsNotSupported
-from pydi.types import Value, NOTABLE
+from dihub.exceptions import AnnotationsNotSupported
+from dihub.types import Value, NOTABLE
 
 
 def is_primitive(obj):
