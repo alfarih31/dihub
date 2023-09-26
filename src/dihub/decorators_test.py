@@ -1,14 +1,14 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock
 
 from dihub.__internal.delegates import InjectedDelegate
-from dihub.constants import _MODULE_ANNOTATIONS, _PROVIDER_ANNOTATIONS
+from dihub.constants import _MODULE_ANNOTATIONS, _PROVIDER_ANNOTATIONS, ROOT_MODULE_DELEGATE
 from dihub.decorators import module, inject, provider, root, export, for_root
-from dihub.exceptions import NotAPyDIModule, NotAPyDIProvider
-from dihub.types import ModuleAnnotation, ProviderAnnotation
+from dihub.exceptions import NotAPyDIModule, NotAPyDIProvider, ReservedInjectToken
+from dihub.types import ModuleAnnotation, ProviderAnnotation, IRootPlugin, IRootRunner, IModuleDelegate
 
 
-class DecoratorsTest(unittest.TestCase):
+class DecoratorsTest(unittest.IsolatedAsyncioTestCase):
     def test_module_decorator_should_set_module_annotation(self):
         @module
         class C: ...
@@ -47,6 +47,17 @@ class DecoratorsTest(unittest.TestCase):
         self.assertIsInstance(B.__annotations__[_PROVIDER_ANNOTATIONS], ProviderAnnotation)
         self.assertIs(B.__annotations__[_PROVIDER_ANNOTATIONS].token, B.__name__)
 
+        b = B()
+        provider(b)
+        self.assertIn(_PROVIDER_ANNOTATIONS, b.__annotations__)
+        self.assertIsInstance(b.__annotations__[_PROVIDER_ANNOTATIONS], ProviderAnnotation)
+        self.assertIs(b.__annotations__[_PROVIDER_ANNOTATIONS].token, b.__class__.__name__)
+
+    def test_provider_decorator_should_raise_ReservedInjectToken(self):
+        with self.assertRaises(ReservedInjectToken):
+            @provider(token=ROOT_MODULE_DELEGATE)
+            class B: ...
+
     def test_root_decorator_should_raise_NotAPyDIModule_to_non_module(self):
         with self.assertRaises(NotAPyDIModule):
             @root
@@ -76,6 +87,37 @@ class DecoratorsTest(unittest.TestCase):
 
         c = C()
         self.assertIsInstance(c, OC)
+
+    def test_root_decorator_should_call_plugin(self):
+        class Plugin(IRootPlugin):
+            def __call__(self, *args, **kwargs):
+                pass
+
+        Plugin.__call__ = MagicMock()
+
+        class OC: ...
+
+        # Implicitly decorate
+        C = module()(OC)
+        C = root(C, plugins=[Plugin()])
+
+        c = C()
+        Plugin.__call__.assert_called_once()
+
+    async def test_root_decorator_should_after_started(self):
+        class OC(IRootRunner):
+            async def after_started(self, root_module_delegate: IModuleDelegate):
+                pass
+
+        OC.after_started = AsyncMock()
+
+        # Implicitly decorate
+        C = module()(OC)
+        C = root()(C)
+
+        c = C()
+        await c
+        OC.after_started.assert_called_once()
 
     def test_root_decorator_should_not_affect_the_actual_class(self):
         class OC:

@@ -1,6 +1,6 @@
 from typing import Union, Tuple, List
 
-from dihub.__internal.helpers import AnnotationOf, validate_dihub_provider
+from dihub.__internal.helpers import AnnotationOf, validate_dihub_provider, get_class_name, get_inject_token_str
 from dihub.__internal.proxies import ProviderProxy
 from dihub.constants import _PROVIDER_ANNOTATIONS
 from dihub.exceptions import ProviderNotFound
@@ -21,8 +21,10 @@ class ProviderDelegate(IProviderDelegate):
     def __str__(self):
         members_str = []
         for i in self.__providers:
-            members_str.append(str(i))
-        return "[%s]" % (",\n".join(members_str))
+            annotations = AnnotationOf(i.provide).get(_PROVIDER_ANNOTATIONS, ProviderAnnotation)
+            members_str.append(
+                "'%s': '%s'" % (annotations.token, get_class_name(i.provide)))
+        return "{%s}" % (", ".join(members_str))
 
     def __add__(self, other: Union[IProviderDelegate, Providers]):
         if isinstance(other, ProviderDelegate):
@@ -58,10 +60,7 @@ class ProviderDelegate(IProviderDelegate):
         raise StopIteration
 
     def __is_token_match(self, this_token: str, that_token: InjectToken) -> bool:
-        if isinstance(that_token, type):
-            return this_token == that_token.__name__
-        else:
-            return this_token == that_token
+        return get_inject_token_str(that_token) == this_token
 
     def __getitem__(self, token: InjectToken) -> Tuple[ProviderProxy, ProviderAnnotation]:
         for p in self.__providers:

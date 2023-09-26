@@ -1,24 +1,20 @@
 from inspect import isfunction
+from typing import Optional
 
-from dihub.__internal.helpers import AnnotationOf
+from dihub.__internal.helpers import AnnotationOf, get_class_name
 from dihub.__internal.proxies import PrimitiveProxy
 from dihub.constants import ProviderScope, _PROVIDER_ANNOTATIONS, ROOT_MODULE_DELEGATE
 from dihub.exceptions import ReservedInjectToken
-from dihub.types import InjectToken, Value, ProviderAnnotation
+from dihub.types import Value, ProviderAnnotation
 
 
-def __process_provider_decorator(provide: Value, token: InjectToken, scope: ProviderScope):
+def __process_provider_decorator(provide: Value, token: str, scope: ProviderScope):
     if isfunction(provide):
         provide = PrimitiveProxy(provide.__name__, provide())
 
     final_token = token
     if final_token is None:
-        if isinstance(provide, PrimitiveProxy):
-            final_token = provide.__name__
-        elif isinstance(provide, type):
-            final_token = provide.__name__
-        else:
-            final_token = provide.__class__.__name__
+        final_token = get_class_name(provide)
 
     if final_token == ROOT_MODULE_DELEGATE:
         raise ReservedInjectToken(final_token)
@@ -27,7 +23,7 @@ def __process_provider_decorator(provide: Value, token: InjectToken, scope: Prov
     return provide
 
 
-def provider(provide: Value = None, /, *, token: InjectToken = None, scope: ProviderScope = ProviderScope.GLOBAL):
+def provider(provide: Optional[Value] = None, /, *, token: Optional[str] = None, scope: ProviderScope = ProviderScope.GLOBAL):
     """
     :param provide: The decorated class
     :param token: Provider injects token. Used to refer the provider upon injection

@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 
-from A import GlobalScopedAService, ModuleScopedAService, LocalScopedAService, IAService
-
 from dihub.decorators import provider, export, inject
+from ..A import GlobalScopedAService, ModuleScopedAService, LocalScopedAService, IAService
 
 BService = "BService"
 

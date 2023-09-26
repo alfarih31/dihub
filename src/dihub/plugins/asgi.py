@@ -1,14 +1,14 @@
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, Optional
 
 from dihub.types import IRootPlugin, IModuleDelegate, InjectToken
 
 
 class ASGI(IRootPlugin):
     from_provider: InjectToken
-    from_module: type = None
-    asgi_provider: Callable[..., Awaitable[None]] = None
+    from_module: Optional[type] = None
+    asgi_provider: Callable[..., Awaitable[None]]
 
-    def __init__(self, from_provider: InjectToken, from_module: type = None):
+    def __init__(self, from_provider: InjectToken, from_module: Optional[type] = None):
         self.from_module = from_module
         self.from_provider = from_provider
 

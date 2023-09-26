@@ -1,13 +1,30 @@
 [tool.poetry]
 name = "dihub"
-version = "0.1.0"
+version = "0.1.1"
 description = "DIHub is a dependency injection framework for Python"
 authors = ["Alfarih Faza <alfarihfz@gmail.com>"]
 license = "BSD"
 readme = "README.md"
+homepage = "https://github.com/alfarih31/dihub"
+repository = "https://github.com/alfarih31/dihub"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+
+[tool.coverage.paths]
+source = ["src"]
+
+[tool.coverage.run]
+branch = true
+source = ["dihub"]
+omit = ["*/venv/*", "*_test.py", "types.py"]
+
+[tool.coverage.report]
+fail_under = 80
 
 [build-system]
 requires = ["poetry-core"]

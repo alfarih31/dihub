@@ -1,7 +1,7 @@
 from inspect import getmembers
 from typing import Optional, Self, Any, Tuple, List
 
-from dihub.__internal.helpers import AnnotationOf, validate_dihub_module
+from dihub.__internal.helpers import AnnotationOf, validate_dihub_module, get_class_name
 from dihub.__internal.proxies import ProviderProxy
 from dihub.constants import _MODULE_ANNOTATIONS, ProviderScope, ROOT_MODULE_DELEGATE
 from dihub.exceptions import (
@@ -10,7 +10,6 @@ from dihub.exceptions import (
     ProviderNotFound,
 )
 from dihub.types import (
-    InjectToken,
     IModuleDelegate,
     IProviderDelegate,
     ModuleAnnotation,
@@ -56,10 +55,10 @@ class ModuleDelegate(IModuleDelegate):
     def __str__(self):
         imports_str = []
         for i in self.__imported_modules_delegate:
-            imports_str.append(i.__str__())
-        return "<%s%s<imports [%s]>>" % (
-            self.__repr__(),
-            str(self.__base_class),
+            imports_str.append(get_class_name(i))
+        return "<%s %s<imports [%s]>>" % (
+            ModuleDelegate.__name__,
+            get_class_name(self.__base_class),
             ",\n".join(imports_str),
         )
 
@@ -87,7 +86,7 @@ class ModuleDelegate(IModuleDelegate):
         raise ModuleNotFound(module)
 
     def get_exported_provider(
-            self, token: InjectToken
+            self, token: str
     ) -> Tuple[Optional[ProviderProxy], Optional[ProviderAnnotation]]:
         provider, annotations = self.__providers[token]
         if provider is not None and annotations.exported:
@@ -96,7 +95,7 @@ class ModuleDelegate(IModuleDelegate):
 
             return provider, annotations
 
-    def get_for_root_provider(self, token: InjectToken) -> Tuple[Optional[ProviderProxy], Optional[ProviderAnnotation]]:
+    def get_for_root_provider(self, token: str) -> Tuple[Optional[ProviderProxy], Optional[ProviderAnnotation]]:
         for rmd in self.__for_root_imports:
             try:
                 dependency, annotations = rmd.get_exported_provider(token)
@@ -111,7 +110,7 @@ class ModuleDelegate(IModuleDelegate):
 
     def __resolve_providers_dependencies(self):
         def resolve_root_module_delegate(provider: ProviderProxy, attribute_name: str, injected_delegate: InjectedDelegate) -> bool:
-            if isinstance(injected_delegate.token, str) and injected_delegate.token == ROOT_MODULE_DELEGATE:
+            if injected_delegate.token == ROOT_MODULE_DELEGATE:
                 setattr(provider.provide, attribute_name, self.root_delegate)
 
                 return True

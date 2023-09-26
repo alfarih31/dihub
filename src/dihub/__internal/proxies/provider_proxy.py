@@ -2,6 +2,7 @@ from copy import deepcopy
 from inspect import getmembers, isclass
 from typing import Any, Type
 
+from dihub.__internal.helpers import get_class_name
 from dihub.types import Value, IProviderProxy, IProviderRunner
 
 
@@ -13,7 +14,7 @@ class ProviderProxy(IProviderProxy):
         self.__provide = provide
 
     def __str__(self):
-        return "<%s %s>" % (ProviderProxy.__name__, str(self.__provide))
+        return "<%s %s>" % (ProviderProxy.__name__, get_class_name(self.__provide))
 
     def __eq__(self, other: Any):
         if isinstance(other, ProviderProxy):

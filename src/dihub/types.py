@@ -6,12 +6,13 @@ from typing import TypeAlias, TypeVar, Callable, List, Union, Self, Tuple, Optio
 from .constants import ProviderScope
 
 Value = TypeVar("Value", covariant=True)
-Config = TypeVar("Config", covariant=True)
+Config = TypeVar("Config", contravariant=True)
 
 
 class Configurable(Protocol[Config, Value]):
     @classmethod
-    def configure(cls, config: Config) -> Value: ...
+    @abstractmethod
+    def configure(cls, Config: Config) -> Value: ...
 
     @abstractmethod
     def __call__(self, *args, **kwargs) -> Value: ...
@@ -109,10 +110,10 @@ class IModuleDelegate(ABC):
     def on_post_boot(self): ...
 
     @abstractmethod
-    def get_exported_provider(self, token: InjectToken) -> Tuple[Optional[IProviderProxy], Optional[ProviderAnnotation]]: ...
+    def get_exported_provider(self, token: str) -> Tuple[Optional[IProviderProxy], Optional[ProviderAnnotation]]: ...
 
     @abstractmethod
-    def get_for_root_provider(self, token: InjectToken) -> Tuple[Optional[IProviderProxy], Optional[ProviderAnnotation]]: ...
+    def get_for_root_provider(self, token: str) -> Tuple[Optional[IProviderProxy], Optional[ProviderAnnotation]]: ...
 
 
 @dataclass(frozen=True)
@@ -133,7 +134,7 @@ class IConfigurableModule(Protocol[Value]):
     __config: Value
 
     @property
-    def config(self) -> Value:
+    def Config(self) -> Value:
         return self.__config
 
     def configure(self, config: Value):

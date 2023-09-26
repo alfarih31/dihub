@@ -1,10 +1,10 @@
 from unittest import TestCase, main
 
-from A import AModule, GlobalScopedAService, ModuleScopedAService, LocalScopedAService
-from B import BModule, BService, IBService
-from app import App
 from dihub.exceptions import ProviderNotFound
 from dihub.types import IModuleDelegate
+from .A import AModule, GlobalScopedAService, ModuleScopedAService, LocalScopedAService
+from .B import BModule, BService, IBService
+from .app import App
 
 
 class AppTest(TestCase):

@@ -30,10 +30,18 @@ class ProviderDelegateTest(unittest.TestCase):
 
         providers = [p]
         expected = ProviderDelegate(providers)
+
+        others = ProviderDelegate(providers)
+
         initial = len(expected)
 
         expected += providers
         self.assertEqual(len(expected), initial + len(providers))
+
+        initial = len(expected)
+
+        expected += others
+        self.assertEqual(len(expected), initial + len(others))
 
     def test_append_should_append_providers(self):
         @provider
@@ -87,6 +95,24 @@ class ProviderDelegateTest(unittest.TestCase):
 
         self.assertIsInstance(expected, ProviderProxy)
         self.assertIs(p, expected.release())
+
+    def test___str___should_return_str(self):
+        @provider
+        def p(): ...
+
+        pd = ProviderDelegate([p])
+
+        self.assertIsInstance(str(pd), str)
+
+    def test___delitem___should_remove_provider(self):
+        @provider
+        def p(): ...
+
+        pd = ProviderDelegate([p])
+
+        initial = len(pd)
+        del pd["p"]
+        self.assertEqual(len(pd), initial - 1)
 
 
 if __name__ == "__main__":
