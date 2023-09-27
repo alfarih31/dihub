@@ -16,6 +16,7 @@ from dihub.types import (
     ProviderAnnotation,
     Instance,
 )
+
 from .injected_delegate import InjectedDelegate
 from .provider_delegate import ProviderDelegate
 
@@ -95,6 +96,8 @@ class ModuleDelegate(IModuleDelegate):
 
             return provider, annotations
 
+        raise ProviderNotFound(token)
+
     def get_for_root_provider(self, token: str) -> Tuple[Optional[ProviderProxy], Optional[ProviderAnnotation]]:
         for rmd in self.__for_root_imports:
             try:
@@ -104,7 +107,12 @@ class ModuleDelegate(IModuleDelegate):
                 continue
 
         if self.parent_delegate is None:
-            raise ProviderNotFound(token)
+            """
+                it's already on root
+                Search from root providers. It's special ability for root module that
+                all of the root exported providers can be accessed by the importd module providers 
+            """
+            return self.get_exported_provider(token)
 
         return self.parent_delegate.get_for_root_provider(token)
 
@@ -170,20 +178,20 @@ class ModuleDelegate(IModuleDelegate):
                 del self.__providers[annotations.token]
 
     def on_boot(self):
+        self.__providers.on_boot()
+
         # Recursive boot imported module
         for i in self.__imported_modules_delegate:
             i.on_boot()
-
-        self.__providers.on_boot()
 
         # Injecting
         self.__resolve_providers_dependencies()
 
     def on_post_boot(self):
+        self.__providers.on_post_boot()
+
         for i in self.__imported_modules_delegate:
             i.on_post_boot()
-
-        self.__providers.on_post_boot()
 
         self.__clean_up()
 

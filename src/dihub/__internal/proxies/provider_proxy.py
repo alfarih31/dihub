@@ -14,7 +14,9 @@ class ProviderProxy(IProviderProxy):
         self.__provide = provide
 
     def __str__(self):
-        return "<%s %s>" % (ProviderProxy.__name__, get_class_name(self.__provide))
+        if isinstance(self.__provide, type):
+            return "<%s %s>" % (ProviderProxy.__name__, get_class_name(self.__provide))
+        return "<%s %s object at %s>" % (ProviderProxy.__name__, get_class_name(self.__provide), hex(id(self.__provide)))
 
     def __eq__(self, other: Any):
         if isinstance(other, ProviderProxy):

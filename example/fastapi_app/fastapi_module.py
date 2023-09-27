@@ -1,6 +1,5 @@
-from fastapi import FastAPI
-
 from dihub.decorators import provider, export, module
+from fastapi import FastAPI
 
 
 @export
