@@ -3,6 +3,7 @@ from typing import Any
 from dihub.constants import _PROVIDER_ANNOTATIONS, _MODULE_ANNOTATIONS
 from dihub.exceptions import NotAPyDIProvider, NotAPyDIModule
 from dihub.types import ProviderAnnotation, ModuleAnnotation
+
 from .annotation_of import AnnotationOf
 
 

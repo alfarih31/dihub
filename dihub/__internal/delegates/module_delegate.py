@@ -1,7 +1,11 @@
-from inspect import getmembers
 from typing import Optional, Self, Any, Tuple, List
 
-from dihub.__internal.helpers import AnnotationOf, validate_dihub_module, get_class_name
+from dihub.__internal.helpers import (
+    AnnotationOf,
+    validate_dihub_module,
+    get_class_name,
+    discover_injected_delegate
+)
 from dihub.__internal.proxies import ProviderProxy
 from dihub.constants import _MODULE_ANNOTATIONS, ProviderScope, ROOT_MODULE_DELEGATE
 from dihub.exceptions import (
@@ -16,7 +20,6 @@ from dihub.types import (
     ProviderAnnotation,
     Instance,
 )
-
 from .injected_delegate import InjectedDelegate
 from .provider_delegate import ProviderDelegate
 
@@ -126,9 +129,7 @@ class ModuleDelegate(IModuleDelegate):
             return False
 
         for provider, _ in self.__providers:
-            for dependency_name, injected_dependency in getmembers(
-                    provider.provide, predicate=lambda x: isinstance(x, InjectedDelegate)
-            ):
+            for dependency_name, injected_dependency in discover_injected_delegate(provider.provide):
                 if resolve_root_module_delegate(provider, dependency_name, injected_dependency):
                     continue
 

@@ -4,6 +4,7 @@ from typing import Callable, Type
 from dihub.__internal.helpers import AnnotationOf, get_class_name
 from dihub.constants import _MODULE_ANNOTATIONS
 from dihub.types import Value, ModuleAnnotation, Configurable, Config
+
 from .provider import provider
 
 

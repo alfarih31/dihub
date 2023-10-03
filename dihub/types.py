@@ -152,3 +152,9 @@ Plugins = List[IRootPlugin]
 class IProviderRunner(ABC):
     @abstractmethod
     def after_started(self): ...
+
+
+class IInjectedDelegate(ABC):
+    @property
+    @abstractmethod
+    def token(self) -> str: ...

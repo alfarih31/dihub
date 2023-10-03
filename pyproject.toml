@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dihub"
-version = "0.1.5"
+version = "0.1.9"
 description = "DIHub is a dependency injection framework for Python"
 authors = ["Alfarih Faza <alfarihfz@gmail.com>"]
 license = "BSD"

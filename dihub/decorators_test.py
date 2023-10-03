@@ -1,4 +1,5 @@
 import unittest
+from typing import Annotated, get_type_hints
 from unittest.mock import MagicMock, AsyncMock
 
 from dihub.__internal.delegates import InjectedDelegate
@@ -26,6 +27,13 @@ class DecoratorsTest(unittest.IsolatedAsyncioTestCase):
         c = C()
         self.assertIsInstance(c.member, InjectedDelegate)
         self.assertEqual(c.member.token, "token")
+
+    def test_inject_should_working_with_annotated(self):
+        class C:
+            member: Annotated[str, inject("token")]
+
+        hints = get_type_hints(C, include_extras=True)
+        self.assertIn("member", hints)
 
     def test_provider_decorator_should_set_provider_annotation(self):
         @provider(token="token")

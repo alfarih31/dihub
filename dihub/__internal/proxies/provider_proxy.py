@@ -10,8 +10,15 @@ class ProviderProxy(IProviderProxy):
     __provide: Value
     __AFTER_START_CALLED = False
 
+    @staticmethod
+    def __release(provide: Value) -> Value:
+        if isinstance(provide, IProviderProxy):
+            return ProviderProxy.__release(provide.release())
+
+        return provide
+
     def __init__(self, provide: Value):
-        self.__provide = provide
+        self.__provide = ProviderProxy.__release(provide)
 
     def __str__(self):
         if isinstance(self.__provide, type):
@@ -51,19 +58,18 @@ class ProviderProxy(IProviderProxy):
         raise TypeError("Can't cast, the provider %s doesn't implement '%s'" % (self.__provide, metaclass.__name__))
 
     def release(self) -> Value:
-        if isinstance(self.__provide, ProviderProxy):
-            return self.__provide.release()
-
         return self.__provide
 
     def __getattr__(self, item):
-        return getattr(self.__provide, item)
+        if item == "_ProviderProxy__provide":
+            raise AttributeError()
+
+        try:
+            return getattr(self.__provide, item)
+        except AttributeError:
+            return self.release()
 
     def __copy__(self):
-        # Avoid copy ProviderProxy.provide as ProviderProxy
-        if isinstance(self.__provide, ProviderProxy):
-            return self.__provide.__copy__()
-
         return ProviderProxy(deepcopy(self.__provide))
 
     @property

@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 from dihub.__internal.proxies import ProviderProxy
 from dihub.decorators import provider
 from dihub.exceptions import NotAPyDIProvider, ProviderNotFound
+
 from .provider_delegate import ProviderDelegate
 
 
