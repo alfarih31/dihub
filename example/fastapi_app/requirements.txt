@@ -10,7 +10,7 @@ cleo==2.0.1
 click==8.1.7
 coverage==7.3.1
 crashtest==0.4.1
-dihub==0.1.1
+dihub==0.1.9
 distlib==0.3.7
 dulwich==0.21.6
 fastapi==0.103.1
