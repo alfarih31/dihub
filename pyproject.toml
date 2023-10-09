@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dihub"
-version = "0.1.9"
+version = "0.1.10"
 description = "DIHub is a dependency injection framework for Python"
 authors = ["Alfarih Faza <alfarihfz@gmail.com>"]
 license = "BSD"
@@ -9,7 +9,7 @@ homepage = "https://github.com/alfarih31/dihub"
 repository = "https://github.com/alfarih31/dihub"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.2"
